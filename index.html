@@ -17,10 +17,10 @@
             font-family: 'Inter', sans-serif;
             overflow: hidden;
         }
-        .page-container {
+        .page-content {
             display: none;
         }
-        .page-container.active {
+        .page-content.active {
             display: block;
         }
         #canvas-container {
@@ -131,19 +131,44 @@
             text-align: center;
             z-index: 100;
         }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .timeline-view { display: none; }
+        .timeline-view.active { display: block; }
     </style>
 </head>
 <body class="bg-neutral-900 text-white">
 
     <div id="canvas-container"></div>
     
-    <!-- Page Containers -->
-    <div id="aura-builder-page" class="page-container active">
+    <!-- Page Content Containers -->
+    <div id="aura-builder-page" class="page-content active">
         <div id="left-toolbar-aura" class="fixed bottom-1rem left-1rem z-10 flex flex-col-reverse items-center gap-4" style="position: fixed; bottom: 1rem; left: 1rem;">
-            <div id="step-counter-container" class="text-sm text-center bg-black/50 p-2 rounded-lg">
+             <div id="step-counter-container" class="text-sm text-center bg-black/50 p-2 rounded-lg">
                 <p>Step: <span id="step-counter">0</span></p>
-            </div>
-            <div id="gizmo-controls" class="flex items-center space-x-2 text-sm bg-black/50 p-2 rounded-lg">
+             </div>
+             <div id="gizmo-controls" class="flex items-center space-x-2 text-sm bg-black/50 p-2 rounded-lg">
                 <label for="worldOriginToggle">World Origin</label>
                 <label class="switch">
                     <input type="checkbox" id="worldOriginToggle" checked>
@@ -174,14 +199,232 @@
         <div id="right-sidebar"></div>
     </div>
 
-    <!-- Placeholder Pages -->
-    <div id="avatar-builder-page" class="page-container"></div>
-    <div id="calendar-builder-page" class="page-container"></div>
-    <div id="memory-palace-page" class="page-container"></div>
-    <div id="social-media-page" class="page-container"></div>
-    <div id="algorithm-settings-page" class="page-container"></div>
-    <div id="file-storage-page" class="page-container"></div>
-    <div id="internet-of-things-page" class="page-container"></div>
+    <div id="avatar-builder-page" class="page-content">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-full max-w-4xl h-[80vh] bg-black/50 backdrop-blur-sm rounded-lg p-8 overflow-y-auto">
+                <h1 class="text-3xl font-bold text-center mb-6">Avatar Builder</h1>
+                <div class="space-y-8">
+                    <!-- Static Data Section -->
+                    <div>
+                        <h2 class="text-xl font-semibold border-b border-gray-600 pb-2 mb-4">Physical Profile (Static)</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <input type="number" placeholder="Age" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="text" placeholder="Height (e.g., 180cm)" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="text" placeholder="Sex" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="number" placeholder="Weight (kg)" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="text" placeholder="Hair Colour & Cut" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="text" placeholder="Skin Colour" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <input type="text" placeholder="Tattoos, Implants, Piercings" class="bg-gray-700 border border-gray-600 rounded p-2 md:col-span-2">
+                            <input type="text" placeholder="Blood Type" class="bg-gray-700 border border-gray-600 rounded p-2">
+                            <textarea placeholder="Clothing & Accessories Style" class="bg-gray-700 border border-gray-600 rounded p-2 md:col-span-3" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <!-- Dynamic Data Section -->
+                    <div>
+                        <h2 class="text-xl font-semibold border-b border-gray-600 pb-2 mb-4">Physiological Profile (Dynamic)</h2>
+                        <div class="p-4 bg-gray-800 rounded-lg text-center">
+                            <p class="text-gray-400">Connect IoT devices (smartwatch, etc.) to stream live data.</p>
+                            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="bg-gray-700 p-3 rounded">
+                                    <p class="text-sm text-gray-400">Heart Rate</p>
+                                    <p class="text-2xl font-bold">-- BPM</p>
+                                </div>
+                                <div class="bg-gray-700 p-3 rounded">
+                                    <p class="text-sm text-gray-400">Sleep</p>
+                                    <p class="text-2xl font-bold">-- Hrs</p>
+                                </div>
+                                <div class="bg-gray-700 p-3 rounded">
+                                    <p class="text-sm text-gray-400">Activity</p>
+                                    <p class="text-2xl font-bold">-- Steps</p>
+                                </div>
+                                <div class="bg-gray-700 p-3 rounded">
+                                    <p class="text-sm text-gray-400">SPO2</p>
+                                    <p class="text-2xl font-bold">-- %</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Psychological Profiling Section -->
+                    <div>
+                        <h2 class="text-xl font-semibold border-b border-gray-600 pb-2 mb-4">Psychological Profile</h2>
+                        <div class="p-4 bg-gray-800 rounded-lg text-center">
+                             <p class="text-gray-400 mb-4">Establish a baseline personality vector through a guided Q&A based on established frameworks.</p>
+                             <button class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Begin Psychological Profile</button>
+                        </div>
+                    </div>
+                     <!-- Genomic Data Section -->
+                    <div>
+                        <h2 class="text-xl font-semibold border-b border-gray-600 pb-2 mb-4">Genomic Data (Optional)</h2>
+                        <div class="p-4 bg-gray-800 rounded-lg text-center">
+                             <p class="text-gray-400 mb-4">Securely upload and integrate tokenized genomic data from blood work, microbiomes, etc.</p>
+                             <button class="px-6 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">Upload Secure Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="timeline-mastery-page" class="page-content">
+        <div class="absolute inset-0 p-8 pt-24 pb-24 flex flex-col items-center justify-center" style="padding-left: 180px;">
+            <div class="w-full h-full bg-black/50 backdrop-blur-sm rounded-lg p-8 flex flex-col">
+                <h1 class="text-3xl font-bold text-center mb-6">Timeline Mastery</h1>
+                <div id="timeline-main-content" class="flex-grow bg-gray-800 rounded-lg p-4">
+                    <!-- Gregorian Calendar View -->
+                    <div id="gregorian-view" class="timeline-view active">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Gregorian Calendar</h2>
+                            <div class="flex space-x-1 bg-gray-700 p-1 rounded-lg">
+                                <button class="px-3 py-1 text-sm rounded-md hover:bg-gray-600">Weekly</button>
+                                <button class="px-3 py-1 text-sm rounded-md bg-blue-600">Monthly</button>
+                                <button class="px-3 py-1 text-sm rounded-md hover:bg-gray-600">Quarterly</button>
+                                <button class="px-3 py-1 text-sm rounded-md hover:bg-gray-600">Seasonally</button>
+                                <button class="px-3 py-1 text-sm rounded-md hover:bg-gray-600">Annually</button>
+                                <button class="px-3 py-1 text-sm rounded-md hover:bg-gray-600">Yearly</button>
+                            </div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center"></div>
+                    </div>
+                    <!-- Milestones View -->
+                    <div id="milestones-view" class="timeline-view">
+                         <h2 class="text-xl font-semibold mb-4">Milestones</h2>
+                         <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" placeholder="Birthplace" class="bg-gray-700 p-2 rounded col-span-2">
+                                <input type="date" class="bg-gray-700 p-2 rounded">
+                                <input type="time" class="bg-gray-700 p-2 rounded">
+                            </div>
+                            <input type="text" placeholder="Add a new reminder..." class="bg-gray-700 p-2 rounded w-full">
+                            <div>
+                                <h3 class="font-semibold mt-4">Counters</h3>
+                                <p>Days since birth: <span id="days-since">...</span></p>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="timeline-controls" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/50 backdrop-blur-sm p-3 rounded-full flex items-center justify-center gap-2">
+            <button data-view="gregorian-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Gregorian</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></button>
+            <button data-view="lunar-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Lunar</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg></button>
+            <button data-view="astrology-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Astrology</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m5 6l-3 3m0 0l-3-3m3 3V10m0 11a9 9 0 110-18 9 9 0 010 18z"></path></svg></button>
+            <button data-view="milestones-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Milestones</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"></path></svg></button>
+            <button data-view="countdowns-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Countdowns</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
+            <button data-view="todo-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">To-Do List</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></button>
+            <button data-view="import-view" class="timeline-btn tooltip h-12 w-12 flex items-center justify-center bg-gray-700 rounded-full hover:bg-gray-600 transition"><span class="tooltip-text">Import .ics</span><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg></button>
+        </div>
+    </div>
+    <div id="memory-palace-page" class="page-content">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-full max-w-4xl h-[80vh] bg-black/50 backdrop-blur-sm rounded-lg p-8 overflow-y-auto">
+                <h1 class="text-3xl font-bold text-center mb-6">Memory Palace</h1>
+                <div class="space-y-6">
+                    <!-- Image Input -->
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">Image</h3>
+                        <div class="flex items-center gap-4">
+                            <button class="flex-1 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Take Image</button>
+                            <label class="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 cursor-pointer text-center">
+                                <span>Upload Image</span>
+                                <input type="file" class="hidden" accept="image/*">
+                            </label>
+                        </div>
+                        <div class="mt-2 h-32 bg-gray-700 rounded flex items-center justify-center text-gray-400">Image Preview</div>
+                    </div>
+                    <!-- Audio Input -->
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">Audio</h3>
+                        <div class="flex items-center gap-4">
+                            <button class="flex-1 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Record Voice</button>
+                            <label class="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 cursor-pointer text-center">
+                                <span>Upload Audio</span>
+                                <input type="file" class="hidden" accept="audio/*">
+                            </label>
+                        </div>
+                        <div class="mt-2 h-16 bg-gray-700 rounded flex items-center justify-center text-gray-400">Audio Player</div>
+                    </div>
+                    <!-- Video Input -->
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">Video</h3>
+                        <div class="flex items-center gap-4">
+                            <button class="flex-1 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Record Video</button>
+                            <label class="flex-1 px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 cursor-pointer text-center">
+                                <span>Upload Video</span>
+                                <input type="file" class="hidden" accept="video/*">
+                            </label>
+                        </div>
+                        <div class="mt-2 h-32 bg-gray-700 rounded flex items-center justify-center text-gray-400">Video Preview</div>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div class="flex gap-4 pt-4 border-t border-gray-700">
+                        <button class="flex-1 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Save Memory</button>
+                        <button class="flex-1 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">Generate Vector</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="social-media-page" class="page-content"></div>
+    <div id="algorithm-settings-page" class="page-content">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-full max-w-2xl bg-black/50 backdrop-blur-sm rounded-lg p-8">
+                <h1 class="text-3xl font-bold text-center mb-6">Algorithm Settings</h1>
+                <div class="space-y-6">
+                    <div>
+                        <label for="ai-personality" class="block mb-2 text-sm font-medium text-gray-300">AI Personality</label>
+                        <select id="ai-personality" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option>Analytical & Precise</option>
+                            <option>Creative & Abstract</option>
+                            <option>Empathetic & Supportive</option>
+                            <option>Socratic & Questioning</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="creativity-slider" class="block mb-2 text-sm font-medium text-gray-300">Creativity vs Logic</label>
+                        <input id="creativity-slider" type="range" min="0" max="100" value="50" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="pt-4 border-t border-gray-700">
+                         <button class="w-full px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition">Generate with New Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="file-storage-page" class="page-content">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-full max-w-4xl h-[80vh] bg-black/50 backdrop-blur-sm rounded-lg p-8 flex flex-col">
+                 <h1 class="text-3xl font-bold text-center mb-6">File Storage</h1>
+                 <div class="flex-1 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center text-gray-400 mb-4">
+                    <p>Drag & Drop Files Here or Click to Upload</p>
+                 </div>
+                 <div class="h-48 bg-gray-800 rounded-lg p-2 overflow-y-auto">
+                    <p class="text-gray-500 p-4 text-center">No files uploaded yet.</p>
+                 </div>
+            </div>
+        </div>
+    </div>
+    <div id="internet-of-things-page" class="page-content">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-full max-w-2xl bg-black/50 backdrop-blur-sm rounded-lg p-8">
+                <h1 class="text-3xl font-bold text-center mb-6">Internet of Things</h1>
+                 <div class="space-y-4">
+                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Aura Smartwatch</h3>
+                            <p class="text-sm text-gray-400">Status: Disconnected</p>
+                        </div>
+                        <button class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Connect</button>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold">Aura Smart Ring</h3>
+                            <p class="text-sm text-gray-400">Status: Disconnected</p>
+                        </div>
+                        <button class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Connect</button>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
 
     <div id="left-toolbar">
         <button class="left-toolbar-btn" data-page="internet-of-things-page">Internet of Things</button>
@@ -189,7 +432,7 @@
         <button class="left-toolbar-btn" data-page="algorithm-settings-page">Algorithm Settings</button>
         <button class="left-toolbar-btn" data-page="social-media-page">Social Media</button>
         <button class="left-toolbar-btn" data-page="memory-palace-page">Memory Palace</button>
-        <button class="left-toolbar-btn" data-page="calendar-builder-page">Calendar Builder</button>
+        <button class="left-toolbar-btn" data-page="timeline-mastery-page">Timeline Mastery</button>
         <button class="left-toolbar-btn" data-page="avatar-builder-page">Avatar Builder</button>
         <button class="left-toolbar-btn active" data-page="aura-builder-page">Aura Builder</button>
     </div>
@@ -223,7 +466,6 @@
         let isDragging = false;
         let activeTorusIndex = 0;
         const allTori = [];
-        let avatarPlane;
         
         const textStates = ['Normal', 'Off', 'Mirrored'];
         let currentTextStateIndex = 0;
@@ -242,6 +484,7 @@
         const stepCounterEl = document.getElementById('step-counter');
         const activeChakraHeader = document.getElementById('active-chakra-header');
         const leftToolbarBtns = document.querySelectorAll('#left-toolbar .left-toolbar-btn');
+        const timelineControls = document.getElementById('timeline-controls');
 
         const chakraData = [
             { name: 'Root', color: '#EF4444' },
@@ -382,15 +625,7 @@
             geosphereTop.position.y = GRID_WIDTH * 2.5;
             geosphereBottom.position.y = -GRID_WIDTH * 2.5;
             scene.add(geosphereTop, geosphereBottom);
-
-            const loader = new THREE.TextureLoader();
-            const avatarTexture = loader.load('https://placehold.co/600x400/111827/FFFFFF?text=Avatar+Builder');
-            const avatarMaterial = new THREE.MeshBasicMaterial({ map: avatarTexture, transparent: true });
-            const avatarGeometry = new THREE.PlaneGeometry(600, 400);
-            avatarPlane = new THREE.Mesh(avatarGeometry, avatarMaterial);
-            avatarPlane.visible = false;
-            scene.add(avatarPlane);
-
+            
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
             
@@ -485,19 +720,18 @@
         }
 
         function switchPage(pageId) {
-            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
 
             leftToolbarBtns.forEach(b => b.classList.remove('active'));
             document.querySelector(`.left-toolbar-btn[data-page="${pageId}"]`).classList.add('active');
             
             allTori.forEach(t => t.group.visible = false);
-            avatarPlane.visible = false;
 
             if (pageId === 'aura-builder-page') {
-                allTori[activeTorusIndex].group.visible = true;
-            } else if (pageId === 'avatar-builder-page') {
-                avatarPlane.visible = true;
+                if (allTori[activeTorusIndex]) {
+                    allTori[activeTorusIndex].group.visible = true;
+                }
             }
             
             const pageName = pageId.replace('-page', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
