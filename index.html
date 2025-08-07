@@ -80,6 +80,28 @@
         .sidebar-icon:hover {
             transform: scale(1.1);
         }
+        .sidebar-icon.active {
+            background-color: rgba(59, 130, 246, 0.8);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .chakra-indicator {
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50% !important;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .chakra-indicator:hover {
+            transform: scale(1.2);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        .chakra-indicator.active {
+            transform: scale(1.3);
+            border-color: white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
         .chakra-dot.active {
             box-shadow: 0 0 15px 3px var(--glow-color), 0 0 5px 1px var(--glow-color) inset;
             border-color: rgba(255,255,255,0.9);
@@ -231,6 +253,46 @@
         .event-orange { background-color: rgba(249, 115, 22, 0.8); color: white; }
         .event-teal { background-color: rgba(20, 184, 166, 0.8); color: white; }
         
+        /* Monthly view styles - fill the whole space */
+        .calendar-grid.monthly-view {
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 0.25rem;
+            height: 100%;
+        }
+        
+        .monthly-view .calendar-day {
+            min-height: 5rem;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+        }
+        
+        /* Quarterly view styles - 3 months side by side */
+        .calendar-grid.quarterly-view {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            height: 100%;
+        }
+        
+        .quarterly-view .calendar-day {
+            min-height: 3rem;
+            font-size: 0.75rem;
+            padding: 0.375rem;
+        }
+        
+        /* Seasonal view styles - 3 months of the season */
+        .calendar-grid.seasonal-view {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            height: 100%;
+        }
+        
+        .seasonal-view .calendar-day {
+            min-height: 3rem;
+            font-size: 0.75rem;
+            padding: 0.375rem;
+        }
+        
         /* Annual view styles - improved space utilization */
         .calendar-grid.annual-view {
             grid-template-columns: repeat(12, 1fr);
@@ -244,17 +306,50 @@
             padding: 0.25rem;
         }
         
-        /* Responsive design for annual view */
+        /* Yearly view styles - 4 years with leap year detection */
+        .calendar-grid.yearly-view {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            height: 100%;
+        }
+        
+        .yearly-view .calendar-day {
+            min-height: 1.5rem;
+            font-size: 0.625rem;
+            padding: 0.125rem;
+            position: relative;
+        }
+        
+        /* Responsive design for all views */
         @media (max-width: 1200px) {
             .calendar-grid.annual-view {
-                grid-template-columns: repeat(6, 1fr);
-                gap: 0.375rem;
+                grid-template-columns: repeat(12, 1fr);
+                gap: 0.25rem;
             }
             
             .annual-view .calendar-day {
-                min-height: 1.75rem;
-                font-size: 0.625rem;
+                min-height: 1.5rem;
+                font-size: 0.5rem;
                 padding: 0.125rem;
+            }
+            
+            .calendar-grid.quarterly-view,
+            .calendar-grid.seasonal-view {
+                grid-template-columns: repeat(1, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .calendar-grid.monthly-view {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 0.125rem;
+            }
+            
+            .monthly-view .calendar-day {
+                min-height: 3rem;
+                font-size: 0.75rem;
+                padding: 0.25rem;
             }
         }
         
@@ -284,17 +379,18 @@
             }
         }
         
-        /* Yearly view styles - improved space utilization */
+        /* Yearly view styles - 4 years with leap year detection */
         .calendar-grid.yearly-view {
-            grid-template-columns: repeat(10, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
             height: 100%;
         }
         
         .yearly-view .calendar-day {
-            min-height: 2.5rem;
-            font-size: 0.875rem;
-            padding: 0.375rem;
+            min-height: 1.5rem;
+            font-size: 0.625rem;
+            padding: 0.125rem;
+            position: relative;
         }
         
         /* Quarterly and Seasonal view styles */
@@ -307,7 +403,7 @@
         /* Weekly view - Google Calendar style with time segments */
         .calendar-grid.weekly-view {
             display: grid;
-            grid-template-columns: 80px 1fr;
+            grid-template-columns: 100px repeat(7, 1fr);
             grid-template-rows: 60px repeat(7, 1fr);
             gap: 1px;
             height: 100%;
@@ -601,7 +697,7 @@
                 font-size: 0.75rem;
                 padding: 0.375rem;
             }
-        }
+,         }
     </style>
 </head>
 <body class="bg-neutral-900 text-white">
@@ -916,7 +1012,7 @@
                         <button class="timeline-period-btn px-3 py-1 text-sm rounded-md bg-blue-600" data-period="monthly">Monthly</button>
                         <button class="timeline-period-btn px-3 py-1 text-sm rounded-md hover:bg-gray-600" data-period="quarterly">Quarterly</button>
                         <button class="timeline-period-btn px-3 py-1 text-sm rounded-md hover:bg-gray-600" data-period="seasonally">Seasonally</button>
-                        <button class="timeline-period-btn px-3 py-1 text-sm rounded-md hover:bg-gray-600" data-period="annually">Annually</button>
+                        <button class="timeline-period-btn px-3 py-1 text-sm rounded-md hover:bg-gray-600" data-period="annual">Annually</button>
                         <button class="timeline-period-btn px-3 py-1 text-sm rounded-md hover:bg-gray-600" data-period="yearly">Yearly</button>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -934,7 +1030,17 @@
                     <!-- Gregorian Calendar View -->
                     <div id="gregorian-view" class="timeline-view active">
                         <div class="flex justify-between items-center mb-4">
+                                                    <div class="flex items-center space-x-4">
                             <h2 class="text-xl font-semibold">Gregorian Calendar</h2>
+                            <div id="location-indicator" class="flex items-center space-x-2 text-sm text-gray-400">
+                                <span>📍</span>
+                                <span id="location-text">Getting location...</span>
+                                <button id="hemisphere-toggle" class="ml-2 px-2 py-1 bg-blue-600 rounded text-xs hover:bg-blue-700">Toggle Hemisphere</button>
+                                <select id="year-selector" class="ml-2 px-2 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600 hidden">
+                                    <!-- Year options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
                             <div class="flex space-x-2">
                                 <button id="add-event-btn" class="px-3 py-1 bg-green-600 rounded hover:bg-green-700 text-sm">+ Add Event</button>
                                 <button id="view-events-btn" class="px-3 py-1 bg-blue-600 rounded hover:bg-blue-700 text-sm">View Events</button>
@@ -2740,25 +2846,488 @@
         </div>
     </div>
     <div id="internet-of-things-page" class="page-content">
-        <div class="absolute inset-0 flex items-center justify-center">
-            <div class="w-full max-w-2xl bg-black/50 backdrop-blur-sm rounded-lg p-8">
-                <h1 class="text-3xl font-bold text-center mb-6">Internet of Things</h1>
-                 <div class="space-y-4">
-                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                        <div>
-                            <h3 class="font-semibold">Aura Smartwatch</h3>
-                            <p class="text-sm text-gray-400">Status: Disconnected</p>
+        <div class="absolute inset-0 p-6 overflow-auto">
+            <div class="w-full max-w-7xl mx-auto h-[90vh] bg-black/50 backdrop-blur-sm rounded-lg p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-3xl font-bold">IoT Omni-GUI Ecosystem</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm">Network Active</span>
                         </div>
-                        <button class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Connect</button>
-                    </div>
-                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between">
-                        <div>
-                            <h3 class="font-semibold">Aura Smart Ring</h3>
-                            <p class="text-sm text-gray-400">Status: Disconnected</p>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm">Cloud Sync</span>
                         </div>
-                        <button class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Connect</button>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm">Edge Processing</span>
+                        </div>
                     </div>
-                 </div>
+                </div>
+
+                <!-- System Status Bar -->
+                <div class="bg-gray-800/50 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-6">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-400">247</div>
+                                <div class="text-xs text-gray-400">Connected Devices</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-400">1.2TB</div>
+                                <div class="text-xs text-gray-400">Data Processed</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-400">99.8%</div>
+                                <div class="text-xs text-gray-400">Uptime</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-400">12ms</div>
+                                <div class="text-xs text-gray-400">Avg Latency</div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-4 py-2 bg-green-600 rounded hover:bg-green-700 text-sm">Deploy All</button>
+                            <button class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 text-sm">Optimize</button>
+                            <button class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700 text-sm">Backup</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid Layout -->
+                <div class="grid grid-cols-3 gap-6 h-[calc(90vh-700px)]">
+                    
+                    <!-- Device Management & Allocation -->
+                    <div class="bg-gray-800/50 rounded-lg p-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-2">🔗</span>
+                            Device Ecosystem
+                        </h2>
+                        
+                        <!-- Device Categories -->
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">⌚</span>
+                                    Wearable Devices
+                                </h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Aura Smartwatch</div>
+                                            <div class="text-xs text-green-400">Connected • 98% Battery</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">Configure</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Aura Smart Ring</div>
+                                            <div class="text-xs text-green-400">Connected • 85% Battery</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">Configure</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Neural Headband</div>
+                                            <div class="text-xs text-yellow-400">Standby • 45% Battery</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">Configure</button>
+                                            <button class="px-2 py-1 bg-gray-600 rounded text-xs">Standby</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">🏠</span>
+                                    Smart Home
+                                </h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Ambient Sensors</div>
+                                            <div class="text-xs text-green-400">12 Active • Optimal</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Security System</div>
+                                            <div class="text-xs text-green-400">Armed • 8 Cameras</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Action buttons for Smart Home -->
+                                <div class="mt-4 space-y-2">
+                                    <button class="w-full px-3 py-2 bg-purple-600 rounded text-xs hover:bg-purple-700">Deploy All Components</button>
+                                    <button class="w-full px-3 py-2 bg-blue-600 rounded text-xs hover:bg-blue-700">Optimize System</button>
+                                    <button class="w-full px-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded text-xs hover:from-purple-700 hover:to-pink-700">Backup Configuration</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">🌐</span>
+                                    Edge Nodes
+                                </h3>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                        <div>
+                                            <div class="font-medium">Local Processing</div>
+                                            <div class="text-xs text-green-400">3 Nodes • 85% Load</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">Monitor</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Component Allocation -->
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-semibold mb-3 flex items-center">
+                                <span class="mr-2">⚙️</span>
+                                Omni-GUI Allocation
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Processing Power</span>
+                                    <div class="w-32 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                    <span class="text-xs">75%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Memory Usage</span>
+                                    <div class="w-32 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                    <span class="text-xs">60%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Storage</span>
+                                    <div class="w-32 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                                    </div>
+                                    <span class="text-xs">45%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Flow & Processing -->
+                    <div class="bg-gray-800/50 rounded-lg p-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-2">🔄</span>
+                            Data Flow & Processing
+                        </h2>
+                        
+                        <!-- Real-time Data Streams -->
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">📊</span>
+                                    Live Data Streams
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="bg-gray-600/50 p-3 rounded">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-sm font-medium">Biometric Data</span>
+                                            <span class="text-xs text-green-400">Active</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 text-xs">
+                                            <div>HR: 72 bpm</div>
+                                            <div>Temp: 36.8°C</div>
+                                            <div>SPO2: 98%</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-600/50 p-3 rounded">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-sm font-medium">Environmental</span>
+                                            <span class="text-xs text-green-400">Active</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 text-xs">
+                                            <div>Temp: 22°C</div>
+                                            <div>Humidity: 45%</div>
+                                            <div>Air: Good</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-600/50 p-3 rounded">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-sm font-medium">Movement</span>
+                                            <span class="text-xs text-green-400">Active</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-2 text-xs">
+                                            <div>Steps: 8,432</div>
+                                            <div>Calories: 2,156</div>
+                                            <div>Active: 6h</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vector Processing -->
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">🧠</span>
+                                    AI Vector Processing
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">Pattern Recognition</span>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                            <span class="text-xs text-green-400">Active</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">Behavioral Analysis</span>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                            <span class="text-xs text-green-400">Active</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">Backup Configuration</span>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                                            <span class="text-xs text-orange-400">Processing</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">Cross-Pollination</span>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                                            <span class="text-xs text-purple-400">Syncing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processing Queue -->
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-semibold mb-3 flex items-center">
+                                <span class="mr-2">📋</span>
+                                Processing Queue
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                    <div>
+                                        <div class="text-sm font-medium">Biometric Analysis</div>
+                                        <div class="text-xs text-gray-400">Processing heart rate patterns</div>
+                                    </div>
+                                    <div class="w-16 bg-gray-600 rounded-full h-1">
+                                        <div class="bg-blue-500 h-1 rounded-full" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                    <div>
+                                        <div class="text-sm font-medium">Environmental Correlation</div>
+                                        <div class="text-xs text-gray-400">Linking weather to mood</div>
+                                    </div>
+                                    <div class="w-16 bg-gray-600 rounded-full h-1">
+                                        <div class="bg-green-500 h-1 rounded-full" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-600/50 p-2 rounded">
+                                    <div>
+                                        <div class="text-sm font-medium">Movement Optimization</div>
+                                        <div class="text-xs text-gray-400">Analyzing activity patterns</div>
+                                    </div>
+                                    <div class="w-16 bg-gray-600 rounded-full h-1">
+                                        <div class="bg-purple-500 h-1 rounded-full" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cloud & Edge Integration -->
+                    <div class="bg-gray-800/50 rounded-lg p-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <span class="mr-2">☁️</span>
+                            Cloud & Edge Integration
+                        </h2>
+                        
+                        <!-- Cloud Services -->
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">☁️</span>
+                                    Cloud Services
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">Vector Database</div>
+                                            <div class="text-xs text-green-400">Connected • 2.3M vectors</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">AI Processing</div>
+                                            <div class="text-xs text-green-400">Active • 12 models</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">Data Analytics</div>
+                                            <div class="text-xs text-green-400">Connected • Real-time</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Edge Computing -->
+                            <div class="bg-gray-700/50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3 flex items-center">
+                                    <span class="mr-2">⚡</span>
+                                    Edge Computing
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">Local Processing</div>
+                                            <div class="text-xs text-green-400">3 nodes • 85% efficiency</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">Monitor</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">Caching Layer</div>
+                                            <div class="text-xs text-green-400">512MB • 78% hit rate</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between bg-gray-600/50 p-3 rounded">
+                                        <div>
+                                            <div class="font-medium">Security Layer</div>
+                                            <div class="text-xs text-green-400">Encrypted • Zero-trust</div>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="px-2 py-1 bg-blue-600 rounded text-xs">View</button>
+                                            <button class="px-2 py-1 bg-green-600 rounded text-xs">Active</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hybrid Sync -->
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-semibold mb-3 flex items-center">
+                                <span class="mr-2">🔄</span>
+                                Hybrid Sync Status
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Data Sync</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span class="text-xs text-green-400">Real-time</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Algorithm Sync</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span class="text-xs text-green-400">Real-time</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Configuration Sync</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                        <span class="text-xs text-blue-400">Syncing</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Security Sync</span>
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span class="text-xs text-green-400">Real-time</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics -->
+                        <div class="bg-gray-700/50 rounded-lg p-4">
+                            <h3 class="font-semibold mb-3 flex items-center">
+                                <span class="mr-2">📈</span>
+                                Performance Metrics
+                            </h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Response Time</span>
+                                    <span class="text-xs text-green-400">12ms avg</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Throughput</span>
+                                    <span class="text-xs text-green-400">1.2GB/s</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Uptime</span>
+                                    <span class="text-xs text-green-400">99.8%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">Error Rate</span>
+                                    <span class="text-xs text-green-400">0.02%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Bar -->
+                <div class="mt-8 pt-4 border-t border-gray-700 flex justify-end items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm text-gray-400">
+                            Last updated: <span class="text-green-400">2 minutes ago</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-green-400">All systems operational</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2831,6 +3400,7 @@
         let countdowns = [];
         let birthDate = null;
         let importantDates = [];
+        let userLocation = null; // Store GPS location
 
         const chakraData = [
             { name: 'Root', color: '#EF4444' },
@@ -2845,6 +3415,83 @@
         function incrementStep(action) {
             stepCounter++;
             stepCounterEl.textContent = stepCounter;
+        }
+        
+        // GPS Location Functions
+        let manualHemisphere = null; // For manual override
+        
+        function getUserLocation() {
+            return userLocation;
+        }
+        
+        function requestGPSLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        };
+                        console.log('GPS Location obtained:', userLocation);
+                        updateLocationIndicator();
+                        // Update seasonal view if currently active
+                        if (currentPeriod === 'seasonally') {
+                            renderCalendar();
+                        }
+                    },
+                    function(error) {
+                        console.log('GPS Error:', error);
+                        // Default to Northern Hemisphere if GPS fails
+                        userLocation = { latitude: 40.7128, longitude: -74.0060 }; // NYC default
+                        updateLocationIndicator();
+                    }
+                );
+            } else {
+                console.log('Geolocation not supported');
+                // Default to Northern Hemisphere
+                userLocation = { latitude: 40.7128, longitude: -74.0060 }; // NYC default
+                updateLocationIndicator();
+            }
+        }
+        
+        function toggleHemisphere() {
+            if (manualHemisphere === null) {
+                // First toggle - switch to opposite of GPS
+                const isSouthernByGPS = userLocation && userLocation.latitude < 0;
+                manualHemisphere = isSouthernByGPS ? 'northern' : 'southern';
+            } else {
+                // Subsequent toggles - switch between hemispheres
+                manualHemisphere = manualHemisphere === 'northern' ? 'southern' : 'northern';
+            }
+            
+            // Update userLocation to reflect manual override
+            if (manualHemisphere === 'southern') {
+                userLocation = { latitude: -33.8688, longitude: 151.2093 }; // Sydney coordinates
+            } else {
+                userLocation = { latitude: 40.7128, longitude: -74.0060 }; // NYC coordinates
+            }
+            
+            updateLocationIndicator();
+            
+            // Update seasonal view if currently active
+            if (currentPeriod === 'seasonally') {
+                renderCalendar();
+            }
+        }
+        
+        function updateLocationIndicator() {
+            const locationText = document.getElementById('location-text');
+            if (userLocation) {
+                const isSouthernHemisphere = userLocation.latitude < 0;
+                const hemisphere = isSouthernHemisphere ? 'Southern' : 'Northern';
+                const location = isSouthernHemisphere ? 'Australia' : 'Northern Hemisphere';
+                locationText.textContent = `${hemisphere} Hemisphere (${location})`;
+                locationText.className = 'text-sm text-green-400';
+            } else {
+                locationText.textContent = 'Location unavailable';
+                locationText.className = 'text-sm text-gray-400';
+            }
         }
 
         function createGridTexture(labelText, cellsToHighlight, color, currentHoverCell = null, textState = 'Normal') {
@@ -3072,6 +3719,9 @@
             // Load saved data
             loadTimelineData();
             
+            // Request GPS location for seasonal view
+            requestGPSLocation();
+            
             // Initial render
             renderCalendar();
             updatePeriodDisplay();
@@ -3132,10 +3782,20 @@
             // Year selector for yearly view
             document.getElementById('year-selector').addEventListener('change', (e) => {
                 const selectedYear = parseInt(e.target.value);
-                currentDate = new Date(selectedYear, currentDate.getMonth(), currentDate.getDate());
-                renderCalendar();
-                updatePeriodDisplay();
+                if (currentPeriod === 'yearly') {
+                    // For yearly view, just re-render with the new year
+                    renderCalendar();
+                    updatePeriodDisplay();
+                } else {
+                    // For other views, update the current date
+                    currentDate = new Date(selectedYear, currentDate.getMonth(), currentDate.getDate());
+                    renderCalendar();
+                    updatePeriodDisplay();
+                }
             });
+            
+            // Hemisphere toggle
+            document.getElementById('hemisphere-toggle').addEventListener('click', toggleHemisphere);
             
             // Setup periodic updates
             setInterval(() => {
@@ -3297,20 +3957,109 @@
                     break;
                 case 'seasonally':
                     const season = Math.floor(currentDate.getMonth() / 3);
-                    const seasons = ['Winter', 'Spring', 'Summer', 'Fall'];
-                    periodText = `${seasons[season]} ${currentDate.getFullYear()}`;
+                    const userLocation = getUserLocation();
+                    const isSouthernHemisphere = userLocation && userLocation.latitude < 0;
+                    
+                    let seasons, seasonEmojis;
+                    if (isSouthernHemisphere) {
+                        seasons = ['Summer', 'Autumn', 'Winter', 'Spring'];
+                        seasonEmojis = ['☀️', '🍂', '❄️', '🌸'];
+                    } else {
+                        seasons = ['Winter', 'Spring', 'Summer', 'Fall'];
+                        seasonEmojis = ['❄️', '🌸', '☀️', '🍂'];
+                    }
+                    
+                    periodText = `${seasonEmojis[season]} ${seasons[season]} ${currentDate.getFullYear()}`;
                     break;
                 case 'annual':
                     periodText = `${currentDate.getFullYear()}`;
                     break;
                 case 'yearly':
-                    const startYear = currentDate.getFullYear() - 4;
-                    const endYear = currentDate.getFullYear() + 5;
-                    periodText = `${startYear} - ${endYear}`;
+                    const yearSelector = document.getElementById('year-selector');
+                    const selectedYear = yearSelector ? parseInt(yearSelector.value) : currentDate.getFullYear();
+                    periodText = `${selectedYear}`;
                     break;
             }
             
             display.textContent = periodText;
+            
+            // Update bottom indicators
+            updateBottomIndicators();
+        }
+        
+        function updateBottomIndicators() {
+            // Only update indicators for Timeline Mastery
+            const currentPage = document.querySelector('.page-content.active');
+            if (!currentPage || !currentPage.id.includes('timeline')) {
+                return;
+            }
+            
+            // Create or update bottom indicators based on current period
+            const indicators = [
+                { period: 'weekly', icon: '📅', label: 'Weekly' },
+                { period: 'monthly', icon: '📆', label: 'Monthly' },
+                { period: 'quarterly', icon: '📊', label: 'Quarterly' },
+                { period: 'seasonally', icon: '🌱', label: 'Seasonal' },
+                { period: 'annual', icon: '📈', label: 'Annual' },
+                { period: 'yearly', icon: '🗓️', label: 'Yearly' },
+                { period: 'lunar', icon: '🌙', label: 'Lunar' }
+            ];
+            
+            // Update the right sidebar with indicators
+            const rightSidebar = document.getElementById('right-sidebar');
+            rightSidebar.innerHTML = '';
+            
+            indicators.forEach(indicator => {
+                const indicatorDiv = document.createElement('div');
+                indicatorDiv.className = `sidebar-icon ${indicator.period === currentPeriod ? 'active' : ''}`;
+                indicatorDiv.innerHTML = indicator.icon;
+                indicatorDiv.title = indicator.label;
+                indicatorDiv.onclick = () => {
+                    if (indicator.period === 'lunar') {
+                        switchTimelineView('lunar');
+                    } else {
+                        switchPeriod(indicator.period);
+                    }
+                };
+                rightSidebar.appendChild(indicatorDiv);
+            });
+        }
+        
+        function updateAuraBuilderSidebar() {
+            // Update right sidebar for Aura Builder with chakra indicators
+            const rightSidebar = document.getElementById('right-sidebar');
+            rightSidebar.innerHTML = '';
+            
+            // Add Yin-Yang symbol at top
+            const yinYangDiv = document.createElement('div');
+            yinYangDiv.className = 'sidebar-icon mb-4';
+            yinYangDiv.innerHTML = '☯';
+            yinYangDiv.title = 'Balance';
+            rightSidebar.appendChild(yinYangDiv);
+            
+            // Add chakra indicators
+            chakraData.forEach((chakra, index) => {
+                const chakraDiv = document.createElement('div');
+                chakraDiv.className = `sidebar-icon chakra-indicator ${index === 0 ? 'active' : ''}`;
+                chakraDiv.style.backgroundColor = chakra.color;
+                chakraDiv.style.width = '24px';
+                chakraDiv.style.height = '24px';
+                chakraDiv.style.borderRadius = '50%';
+                chakraDiv.title = chakra.name;
+                chakraDiv.onclick = () => {
+                    // Remove active class from all chakras
+                    document.querySelectorAll('.chakra-indicator').forEach(c => c.classList.remove('active'));
+                    // Add active class to clicked chakra
+                    chakraDiv.classList.add('active');
+                    // Update the active chakra header
+                    const activeChakraHeader = document.getElementById('active-chakra-header');
+                    if (activeChakraHeader) {
+                        activeChakraHeader.textContent = chakra.name + ' Chakra';
+                        activeChakraHeader.style.color = chakra.color;
+                    }
+                };
+                rightSidebar.appendChild(chakraDiv);
+            });
         }
         
         function renderCalendar() {
@@ -3344,6 +4093,7 @@
                     renderSeasonalView();
                     return;
                 case 'annual':
+                case 'annually':
                     // Show all 12 months in a grid
                     renderAnnualView();
                     return;
@@ -3359,19 +4109,19 @@
                     grid.className = 'calendar-grid monthly-view';
             }
             
-            // Create calendar header for monthly view (weekly has its own header)
-            if (currentPeriod === 'monthly') {
-                const header = document.querySelector('.calendar-header');
-                header.style.display = 'grid';
-                header.innerHTML = '';
-                for (let i = 0; i < 7; i++) {
-                    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i];
-                    const dayDiv = document.createElement('div');
-                    dayDiv.className = 'text-center text-sm font-semibold text-gray-400';
-                    dayDiv.textContent = dayName;
-                    header.appendChild(dayDiv);
-                }
-            }
+                                        // Create calendar header for monthly view (weekly has its own header)
+                            if (currentPeriod === 'monthly') {
+                                const header = document.querySelector('.calendar-header');
+                                header.style.display = 'grid';
+                                header.innerHTML = '';
+                                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                for (let i = 0; i < 7; i++) {
+                                    const dayDiv = document.createElement('div');
+                                    dayDiv.className = 'text-center text-sm font-semibold text-gray-400';
+                                    dayDiv.textContent = dayNames[i];
+                                    header.appendChild(dayDiv);
+                                }
+                            }
             
             // Generate calendar days
             for (let i = 0; i < daysToShow; i++) {
@@ -3379,12 +4129,12 @@
                 date.setDate(startDate.getDate() + i);
                 
                 const dayDiv = document.createElement('div');
-                dayDiv.className = 'calendar-day p-2 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors';
+                dayDiv.className = 'calendar-day p-3 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors min-h-[4rem] flex flex-col justify-between';
                 
                 // Check if it's today
                 const today = new Date();
                 if (date.toDateString() === today.toDateString()) {
-                    dayDiv.classList.add('today');
+                    dayDiv.classList.add('today', 'bg-blue-600', 'text-white', 'font-bold');
                 }
                 
                 // Check if it's in the current period
@@ -3394,7 +4144,7 @@
                     }
                 } else if (currentPeriod === 'monthly') {
                     if (date.getMonth() !== currentDate.getMonth()) {
-                        dayDiv.classList.add('other-month');
+                        dayDiv.classList.add('other-month', 'text-gray-500');
                     }
                 } else if (currentPeriod === 'quarterly' || currentPeriod === 'seasonally') {
                     const quarter = Math.floor(currentDate.getMonth() / 3);
@@ -3404,7 +4154,12 @@
                     }
                 }
                 
-                dayDiv.textContent = date.getDate();
+                // Create day number element
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'text-sm font-semibold';
+                dayNumber.textContent = date.getDate();
+                dayDiv.appendChild(dayNumber);
+                
                 dayDiv.onclick = () => showEventModal(date);
                 
                 // Add events for this day
@@ -3413,12 +4168,18 @@
                     return eventDate.toDateString() === date.toDateString();
                 });
                 
+                // Create events container
+                const eventsContainer = document.createElement('div');
+                eventsContainer.className = 'flex flex-col space-y-1 mt-1';
+                
                 dayEvents.forEach(event => {
                     const eventElement = document.createElement('div');
-                    eventElement.className = `event-indicator event-${event.color}`;
+                    eventElement.className = `event-indicator event-${event.color} text-xs p-1 rounded truncate`;
                     eventElement.textContent = event.title;
-                    dayDiv.appendChild(eventElement);
+                    eventsContainer.appendChild(eventElement);
                 });
+                
+                dayDiv.appendChild(eventsContainer);
                 
                 grid.appendChild(dayDiv);
             }
@@ -3432,23 +4193,28 @@
             // Create annual view header
             const header = document.querySelector('.calendar-header');
             header.innerHTML = '';
+            header.className = 'calendar-header grid grid-cols-12 gap-2 mb-4';
+            
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Add year header
+            const yearHeader = document.createElement('div');
+            yearHeader.className = 'col-span-12 text-center text-2xl font-bold text-purple-400 mb-4';
+            yearHeader.textContent = `${currentDate.getFullYear()}`;
+            header.appendChild(yearHeader);
+            
+            // Add month headers
             for (let i = 0; i < 12; i++) {
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'text-center text-sm font-semibold text-gray-400';
+                monthDiv.className = 'text-center text-sm font-semibold text-gray-400 bg-gray-700 p-2 rounded';
                 monthDiv.textContent = months[i];
                 header.appendChild(monthDiv);
             }
             
-            // Create 12 month columns
+            // Create 12 month columns in a responsive grid
             for (let month = 0; month < 12; month++) {
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'flex flex-col space-y-1 h-full';
-                
-                const monthName = document.createElement('div');
-                monthName.className = 'text-center text-xs font-semibold text-gray-500 mb-2';
-                monthName.textContent = months[month];
-                monthDiv.appendChild(monthName);
+                monthDiv.className = 'flex flex-col space-y-1 h-full bg-gray-700 p-2 rounded';
                 
                 // Get first day of month and number of days
                 const firstDay = new Date(currentDate.getFullYear(), month, 1);
@@ -3459,20 +4225,20 @@
                 // Add empty cells for days before month starts
                 for (let i = 0; i < startDay; i++) {
                     const emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'h-4';
+                    emptyDiv.className = 'h-4 bg-gray-600 rounded';
                     monthDiv.appendChild(emptyDiv);
                 }
                 
                 // Add days of the month
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayDiv = document.createElement('div');
-                    dayDiv.className = 'calendar-day text-xs text-center p-1 rounded cursor-pointer hover:bg-gray-700';
+                    dayDiv.className = 'calendar-day text-xs text-center p-1 rounded cursor-pointer hover:bg-gray-600 transition-colors min-h-[1.5rem] flex items-center justify-center';
                     
                     const date = new Date(currentDate.getFullYear(), month, day);
                     const today = new Date();
                     
                     if (date.toDateString() === today.toDateString()) {
-                        dayDiv.classList.add('today');
+                        dayDiv.classList.add('today', 'bg-blue-600', 'text-white', 'font-bold');
                     }
                     
                     dayDiv.textContent = day;
@@ -3485,7 +4251,9 @@
                     });
                     
                     if (dayEvents.length > 0) {
-                        dayDiv.classList.add('bg-blue-600');
+                        const eventIndicator = document.createElement('div');
+                        eventIndicator.className = 'w-1 h-1 bg-green-400 rounded-full mt-1';
+                        dayDiv.appendChild(eventIndicator);
                     }
                     
                     monthDiv.appendChild(dayDiv);
@@ -3504,10 +4272,10 @@
             const yearSelector = document.getElementById('year-selector');
             yearSelector.classList.remove('hidden');
             
-            // Populate year selector
+            // Populate year selector with a wider range
             yearSelector.innerHTML = '';
             const currentYear = currentDate.getFullYear();
-            for (let year = currentYear - 50; year <= currentYear + 50; year++) {
+            for (let year = currentYear - 100; year <= currentYear + 100; year++) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
@@ -3517,42 +4285,70 @@
                 yearSelector.appendChild(option);
             }
             
-            // Create yearly view header
+            // Create yearly view header with 4 years
             const header = document.querySelector('.calendar-header');
             header.innerHTML = '';
-            const years = [];
-            for (let i = -4; i <= 5; i++) {
-                years.push(currentYear + i);
+            header.className = 'calendar-header grid grid-cols-4 gap-4 mb-4';
+            
+            const selectedYear = parseInt(yearSelector.value);
+            const years = [selectedYear - 1, selectedYear, selectedYear + 1, selectedYear + 2];
+            
+            // Add year headers
+            for (let year of years) {
+                const yearHeader = document.createElement('div');
+                yearHeader.className = 'text-center text-lg font-bold text-purple-400';
+                
+                // Check if it's a leap year
+                const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+                const leapYearIndicator = isLeapYear ? ' 🐸' : '';
+                
+                yearHeader.textContent = `${year}${leapYearIndicator}`;
+                header.appendChild(yearHeader);
             }
             
-            for (let year of years) {
+            // Create 4 year columns
+            for (let yearIndex = 0; yearIndex < 4; yearIndex++) {
+                const year = years[yearIndex];
                 const yearDiv = document.createElement('div');
-                yearDiv.className = 'text-center text-sm font-semibold text-gray-400';
-                yearDiv.textContent = year;
-                header.appendChild(yearDiv);
-            }
-            
-            // Create year columns
-            for (let year of years) {
-                const yearDiv = document.createElement('div');
-                yearDiv.className = 'flex flex-col space-y-1 h-full';
+                yearDiv.className = 'flex flex-col space-y-1 h-full bg-gray-700 p-2 rounded';
                 
-                const yearName = document.createElement('div');
-                yearName.className = 'text-center text-xs font-semibold text-gray-500 mb-2';
-                yearName.textContent = year;
-                yearDiv.appendChild(yearName);
+                // Check if it's a leap year
+                const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
                 
-                // Show months as dots or small indicators
+                // Create month indicators for this year
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
                 for (let month = 0; month < 12; month++) {
                     const monthDiv = document.createElement('div');
-                    monthDiv.className = 'calendar-day text-xs text-center p-1 rounded cursor-pointer hover:bg-gray-700';
+                    monthDiv.className = 'text-xs text-center p-1 rounded cursor-pointer hover:bg-gray-600 transition-colors';
                     
-                    const monthNames = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
-                    monthDiv.textContent = monthNames[month];
+                    // Get days in this month
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    
+                    // Highlight February in leap years
+                    if (month === 1 && isLeapYear) {
+                        monthDiv.classList.add('bg-green-600', 'text-white', 'font-bold');
+                        monthDiv.textContent = `${monthNames[month]} (29)`;
+                    } else {
+                        monthDiv.textContent = monthNames[month];
+                    }
                     
                     // Check if current month/year
-                    if (year === currentDate.getFullYear() && month === currentDate.getMonth()) {
-                        monthDiv.classList.add('today');
+                    const today = new Date();
+                    if (year === today.getFullYear() && month === today.getMonth()) {
+                        monthDiv.classList.add('bg-blue-600', 'text-white', 'font-bold');
+                    }
+                    
+                    // Check for events in this month
+                    const monthEvents = events.filter(event => {
+                        const eventDate = new Date(event.startDate);
+                        return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+                    });
+                    
+                    if (monthEvents.length > 0) {
+                        const eventIndicator = document.createElement('div');
+                        eventIndicator.className = 'w-1 h-1 bg-green-400 rounded-full mt-1 mx-auto';
+                        monthDiv.appendChild(eventIndicator);
                     }
                     
                     monthDiv.onclick = () => {
@@ -4245,6 +5041,11 @@
                 if (allTori[activeTorusIndex]) {
                     allTori[activeTorusIndex].group.visible = true;
                 }
+                // Update sidebar for Aura Builder
+                updateAuraBuilderSidebar();
+            } else if (pageId === 'timeline-mastery-page') {
+                // Update sidebar for Timeline Mastery
+                updateBottomIndicators();
             }
             
             const pageName = pageId.replace('-page', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -4650,13 +5451,15 @@
             const weekStart = new Date(currentDate);
             weekStart.setDate(currentDate.getDate() - currentDate.getDay());
             
-            // Create time column header
+            // Create time column header (grid position: row 1, column 1)
             const timeHeader = document.createElement('div');
             timeHeader.className = 'time-header';
+            timeHeader.style.gridRow = '1';
+            timeHeader.style.gridColumn = '1';
             timeHeader.textContent = 'Time';
             grid.appendChild(timeHeader);
             
-            // Create day headers
+            // Create day headers (grid positions: row 1, columns 2-8)
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             for (let i = 0; i < 7; i++) {
                 const dayDate = new Date(weekStart);
@@ -4664,6 +5467,8 @@
                 
                 const dayHeader = document.createElement('div');
                 dayHeader.className = 'day-header';
+                dayHeader.style.gridRow = '1';
+                dayHeader.style.gridColumn = `${i + 2}`;
                 dayHeader.innerHTML = `
                     <div class="text-center">
                         <div class="text-sm font-semibold">${dayNames[i]}</div>
@@ -4748,18 +5553,24 @@
             header.innerHTML = '';
             header.className = 'calendar-header grid grid-cols-3 gap-4 mb-2';
             
+            // Add quarter header
+            const quarterHeader = document.createElement('div');
+            quarterHeader.className = 'col-span-3 text-center text-lg font-bold text-blue-400 mb-2';
+            quarterHeader.textContent = `${quarterNames[quarter]} ${currentDate.getFullYear()}`;
+            header.appendChild(quarterHeader);
+            
             // Add month headers for each month in the quarter
             for (let month = quarter * 3; month < (quarter + 1) * 3; month++) {
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'text-center text-sm font-semibold text-gray-400';
+                monthDiv.className = 'text-center text-sm font-semibold text-gray-400 bg-gray-700 p-2 rounded';
                 monthDiv.textContent = `${months[month]} ${currentDate.getFullYear()}`;
                 header.appendChild(monthDiv);
             }
             
-            // Create 3 month columns side by side
+            // Create 3 month columns side by side with full height
             for (let month = quarter * 3; month < (quarter + 1) * 3; month++) {
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'flex flex-col space-y-1 h-full';
+                monthDiv.className = 'flex flex-col space-y-1 h-full bg-gray-700 p-2 rounded';
                 
                 // Get first day of month and number of days
                 const firstDay = new Date(currentDate.getFullYear(), month, 1);
@@ -4770,20 +5581,20 @@
                 // Add empty cells for days before month starts
                 for (let i = 0; i < startDay; i++) {
                     const emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'h-8';
+                    emptyDiv.className = 'h-8 bg-gray-600 rounded';
                     monthDiv.appendChild(emptyDiv);
                 }
                 
                 // Add days of the month
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayDiv = document.createElement('div');
-                    dayDiv.className = 'calendar-day text-xs text-center p-1 rounded cursor-pointer hover:bg-gray-700';
+                    dayDiv.className = 'calendar-day text-xs text-center p-2 rounded cursor-pointer hover:bg-gray-600 transition-colors min-h-[2rem] flex items-center justify-center';
                     
                     const date = new Date(currentDate.getFullYear(), month, day);
                     const today = new Date();
                     
                     if (date.toDateString() === today.toDateString()) {
-                        dayDiv.classList.add('today');
+                        dayDiv.classList.add('today', 'bg-blue-600', 'text-white', 'font-bold');
                     }
                     
                     dayDiv.textContent = day;
@@ -4796,7 +5607,9 @@
                     });
                     
                     if (dayEvents.length > 0) {
-                        dayDiv.classList.add('bg-blue-600');
+                        const eventIndicator = document.createElement('div');
+                        eventIndicator.className = 'w-2 h-2 bg-green-400 rounded-full mt-1';
+                        dayDiv.appendChild(eventIndicator);
                     }
                     
                     monthDiv.appendChild(dayDiv);
@@ -4811,8 +5624,44 @@
             grid.innerHTML = '';
             grid.className = 'calendar-grid seasonal-view';
             
-            const season = Math.floor(currentDate.getMonth() / 3);
-            const seasonNames = ['Winter', 'Spring', 'Summer', 'Fall'];
+            // GPS-based season calculation for Southern Hemisphere
+            const userLocation = getUserLocation(); // This would get GPS coordinates
+            const isSouthernHemisphere = userLocation && userLocation.latitude < 0;
+            
+            let season, seasonNames, seasonEmojis;
+            
+            if (isSouthernHemisphere) {
+                // Southern Hemisphere seasons (opposite to Northern)
+                // Summer: Dec-Feb, Autumn: Mar-May, Winter: Jun-Aug, Spring: Sep-Nov
+                const month = currentDate.getMonth();
+                if (month >= 11 || month <= 1) { // Dec, Jan, Feb
+                    season = 0; // Summer
+                } else if (month >= 2 && month <= 4) { // Mar, Apr, May
+                    season = 1; // Autumn
+                } else if (month >= 5 && month <= 7) { // Jun, Jul, Aug
+                    season = 2; // Winter
+                } else { // Sep, Oct, Nov
+                    season = 3; // Spring
+                }
+                seasonNames = ['Summer', 'Autumn', 'Winter', 'Spring'];
+                seasonEmojis = ['☀️', '🍂', '❄️', '🌸'];
+            } else {
+                // Northern Hemisphere seasons (default)
+                // Winter: Dec-Feb, Spring: Mar-May, Summer: Jun-Aug, Fall: Sep-Nov
+                const month = currentDate.getMonth();
+                if (month >= 11 || month <= 1) { // Dec, Jan, Feb
+                    season = 0; // Winter
+                } else if (month >= 2 && month <= 4) { // Mar, Apr, May
+                    season = 1; // Spring
+                } else if (month >= 5 && month <= 7) { // Jun, Jul, Aug
+                    season = 2; // Summer
+                } else { // Sep, Oct, Nov
+                    season = 3; // Fall
+                }
+                seasonNames = ['Winter', 'Spring', 'Summer', 'Fall'];
+                seasonEmojis = ['❄️', '🌸', '☀️', '🍂'];
+            }
+            
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             
             // Create seasonal view header
@@ -4820,18 +5669,41 @@
             header.innerHTML = '';
             header.className = 'calendar-header grid grid-cols-3 gap-4 mb-2';
             
+            // Add season header
+            const seasonHeader = document.createElement('div');
+            seasonHeader.className = 'col-span-3 text-center text-lg font-bold text-green-400 mb-2';
+            seasonHeader.textContent = `${seasonEmojis[season]} ${seasonNames[season]} ${currentDate.getFullYear()}`;
+            header.appendChild(seasonHeader);
+            
             // Add month headers for each month in the season
-            for (let month = season * 3; month < (season + 1) * 3; month++) {
+            let seasonMonths;
+            if (isSouthernHemisphere) {
+                // Southern Hemisphere season months
+                if (season === 0) seasonMonths = [11, 0, 1]; // Summer: Dec, Jan, Feb
+                else if (season === 1) seasonMonths = [2, 3, 4]; // Autumn: Mar, Apr, May
+                else if (season === 2) seasonMonths = [5, 6, 7]; // Winter: Jun, Jul, Aug
+                else seasonMonths = [8, 9, 10]; // Spring: Sep, Oct, Nov
+            } else {
+                // Northern Hemisphere season months
+                if (season === 0) seasonMonths = [11, 0, 1]; // Winter: Dec, Jan, Feb
+                else if (season === 1) seasonMonths = [2, 3, 4]; // Spring: Mar, Apr, May
+                else if (season === 2) seasonMonths = [5, 6, 7]; // Summer: Jun, Jul, Aug
+                else seasonMonths = [8, 9, 10]; // Fall: Sep, Oct, Nov
+            }
+            
+            for (let i = 0; i < 3; i++) {
+                const month = seasonMonths[i];
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'text-center text-sm font-semibold text-gray-400';
+                monthDiv.className = 'text-center text-sm font-semibold text-gray-400 bg-gray-700 p-2 rounded';
                 monthDiv.textContent = `${months[month]} ${currentDate.getFullYear()}`;
                 header.appendChild(monthDiv);
             }
             
-            // Create 3 month columns side by side
-            for (let month = season * 3; month < (season + 1) * 3; month++) {
+            // Create 3 month columns side by side with full height
+            for (let i = 0; i < 3; i++) {
+                const month = seasonMonths[i];
                 const monthDiv = document.createElement('div');
-                monthDiv.className = 'flex flex-col space-y-1 h-full';
+                monthDiv.className = 'flex flex-col space-y-1 h-full bg-gray-700 p-2 rounded';
                 
                 // Get first day of month and number of days
                 const firstDay = new Date(currentDate.getFullYear(), month, 1);
