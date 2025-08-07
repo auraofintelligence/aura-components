@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura of Intelligence - Torus Formation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Dark with Red Accent -->
+    <!-- Application Structure Plan: A multi-page application structure. The left toolbar now functions as the main navigation. Each button corresponds to a 'page' (a full-screen div). JavaScript manages showing/hiding pages and highlighting the active button. This creates a scalable SPA framework. -->
+    <!-- Visualization & Content Choices: Report Info: 12x24 Matrix Tables. Goal: Show the physical formation of the horn torus. Viz Method: A 3D scene using Three.js. Interaction: Raycasting detects clicks/drags for persistent facet selection. Camera controls are toggled with the spacebar. The step counter logic is fixed to count per-action instead of per-frame. The corner gizmo is now fully decoupled from the main camera's position. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .page-container {
+            display: none;
+        }
+        .page-container.active {
+            display: block;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Behind UI */
+        }
+        #controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        #right-sidebar {
+            position: fixed;
+            top: 50%;
+            right: 1.5rem;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 9999px;
+        }
+        #left-toolbar {
+            position: fixed;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .sidebar-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: rgba(255,255,255,0.7);
+        }
+        .sidebar-icon:hover {
+            transform: scale(1.1);
+        }
+        .chakra-dot.active {
+            box-shadow: 0 0 15px 3px var(--glow-color), 0 0 5px 1px var(--glow-color) inset;
+            border-color: rgba(255,255,255,0.9);
+        }
+        #gizmo-container {
+            width: 100px;
+            height: 100px;
+        }
+        #gizmo-controls {
+            background-color: rgba(0,0,0,0.5);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #4A5568; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #48BB78; }
+        input:checked + .slider:before { transform: translateX(14px); }
+        .left-toolbar-btn {
+            background-color: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 150px;
+            text-align: center;
+        }
+        .left-toolbar-btn:hover {
+            background-color: rgba(55, 65, 81, 0.8);
+        }
+        .left-toolbar-btn.active {
+             background-color: rgba(79, 70, 229, 0.8);
+             border-color: rgba(129, 140, 248, 0.7);
+        }
+        .welcome-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 2rem;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 1rem;
+            text-align: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="bg-neutral-900 text-white">
+
+    <div id="canvas-container"></div>
+    
+    <!-- Page Containers -->
+    <div id="aura-builder-page" class="page-container active">
+        <div id="left-toolbar-aura" class="fixed bottom-1rem left-1rem z-10 flex flex-col-reverse items-center gap-4" style="position: fixed; bottom: 1rem; left: 1rem;">
+            <div id="step-counter-container" class="text-sm text-center bg-black/50 p-2 rounded-lg">
+                <p>Step: <span id="step-counter">0</span></p>
+            </div>
+            <div id="gizmo-controls" class="flex items-center space-x-2 text-sm bg-black/50 p-2 rounded-lg">
+                <label for="worldOriginToggle">World Origin</label>
+                <label class="switch">
+                    <input type="checkbox" id="worldOriginToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div id="gizmo-container"></div>
+        </div>
+        <div id="header-info" class="fixed top-4 left-1/2 -translate-x-1/2 z-10 bg-black/50 p-2 px-4 rounded-lg text-sm flex flex-col items-center gap-2">
+            <p id="active-chakra-header" class="font-bold text-lg"></p>
+            <p>Hold <kbd class="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Space</kbd> to move camera</p>
+        </div>
+        <div id="controls" class="bg-black/50 backdrop-blur-sm p-4 rounded-lg flex items-center space-x-4">
+            <select id="viewSelect" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                <option value="flat">Flat View</option>
+                <option value="torus">Torus View</option>
+            </select>
+            <button id="interiorBtn" class="hidden px-6 py-2 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition whitespace-nowrap">Enter Interior</button>
+            <select id="textToggleSelect" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                <option value="Normal">Text: Normal</option>
+                <option value="Off">Text: Off</option>
+                <option value="Mirrored">Text: Mirrored</option>
+            </select>
+            <button id="saveBtn" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Save</button>
+            <button id="loadBtn" class="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition">Load</button>
+            <button id="resetBtn" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">Reset</button>
+        </div>
+        <div id="right-sidebar"></div>
+    </div>
+
+    <!-- Placeholder Pages -->
+    <div id="avatar-builder-page" class="page-container"></div>
+    <div id="calendar-builder-page" class="page-container"></div>
+    <div id="memory-palace-page" class="page-container"></div>
+    <div id="social-media-page" class="page-container"></div>
+    <div id="algorithm-settings-page" class="page-container"></div>
+    <div id="file-storage-page" class="page-container"></div>
+    <div id="internet-of-things-page" class="page-container"></div>
+
+    <div id="left-toolbar">
+        <button class="left-toolbar-btn" data-page="internet-of-things-page">Internet of Things</button>
+        <button class="left-toolbar-btn" data-page="file-storage-page">File Storage</button>
+        <button class="left-toolbar-btn" data-page="algorithm-settings-page">Algorithm Settings</button>
+        <button class="left-toolbar-btn" data-page="social-media-page">Social Media</button>
+        <button class="left-toolbar-btn" data-page="memory-palace-page">Memory Palace</button>
+        <button class="left-toolbar-btn" data-page="calendar-builder-page">Calendar Builder</button>
+        <button class="left-toolbar-btn" data-page="avatar-builder-page">Avatar Builder</button>
+        <button class="left-toolbar-btn active" data-page="aura-builder-page">Aura Builder</button>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const COLS = 24;
+        const ROWS = 12;
+        const CELL_SIZE = 20;
+        const GRID_WIDTH = COLS * CELL_SIZE;
+        const GRID_HEIGHT = ROWS * CELL_SIZE;
+
+        let scene, camera, renderer, controls;
+        let gizmoScene, gizmoCamera, gizmoRenderer, worldOriginGizmo;
+        let geosphereTop, geosphereBottom;
+        let raycaster, mouse;
+        let cameraState = 'outside';
+        let lastExteriorCamPos = new THREE.Vector3(0, 0, 600);
+        let clock;
+        let isDragging = false;
+        let activeTorusIndex = 0;
+        const allTori = [];
+        let avatarPlane;
+        
+        const textStates = ['Normal', 'Off', 'Mirrored'];
+        let currentTextStateIndex = 0;
+        let stepCounter = 0;
+
+        const viewSelect = document.getElementById('viewSelect');
+        const interiorBtn = document.getElementById('interiorBtn');
+        const textToggleSelect = document.getElementById('textToggleSelect');
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const canvasContainer = document.getElementById('canvas-container');
+        const gizmoContainer = document.getElementById('gizmo-container');
+        const rightSidebar = document.getElementById('right-sidebar');
+        const worldOriginToggle = document.getElementById('worldOriginToggle');
+        const stepCounterEl = document.getElementById('step-counter');
+        const activeChakraHeader = document.getElementById('active-chakra-header');
+        const leftToolbarBtns = document.querySelectorAll('#left-toolbar .left-toolbar-btn');
+
+        const chakraData = [
+            { name: 'Root', color: '#EF4444' },
+            { name: 'Sacral', color: '#F97316' },
+            { name: 'Solar Plexus', color: '#EAB308' },
+            { name: 'Heart', color: '#22C55E' },
+            { name: 'Throat', color: '#3B82F6' },
+            { name: 'Third Eye', color: '#6366F1' },
+            { name: 'Crown', color: '#8B5CF6' }
+        ];
+
+        function incrementStep(action) {
+            stepCounter++;
+            stepCounterEl.textContent = stepCounter;
+        }
+
+        function createGridTexture(labelText, cellsToHighlight, color, currentHoverCell = null, textState = 'Normal') {
+            const canvas = document.createElement('canvas');
+            canvas.width = GRID_WIDTH;
+            canvas.height = GRID_HEIGHT;
+            const context = canvas.getContext('2d');
+
+            context.fillStyle = '#111827';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            context.fillStyle = color + 'B3';
+            cellsToHighlight.forEach(key => {
+                const [x, y] = key.split('-').map(Number);
+                context.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            });
+
+            if (currentHoverCell) {
+                context.fillStyle = color + '66';
+                context.fillRect(currentHoverCell.x * CELL_SIZE, currentHoverCell.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            }
+            
+            context.strokeStyle = '#4B5563';
+            context.lineWidth = 2;
+            for (let i = 0; i <= ROWS; i++) {
+                context.beginPath();
+                context.moveTo(0, i * CELL_SIZE);
+                context.lineTo(GRID_WIDTH, i * CELL_SIZE);
+                context.stroke();
+            }
+            for (let i = 0; i <= COLS; i++) {
+                context.beginPath();
+                context.moveTo(i * CELL_SIZE, 0);
+                context.lineTo(i * CELL_SIZE, GRID_HEIGHT);
+                context.stroke();
+            }
+            
+            if (textState !== 'Off') {
+                context.save();
+                if (textState === 'Mirrored') {
+                    context.translate(canvas.width, 0);
+                    context.scale(-1, 1);
+                }
+                context.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                context.font = 'bold 32px Inter';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(labelText, GRID_WIDTH / 2, GRID_HEIGHT / 2);
+                context.restore();
+            }
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        function updateTexture(plane, hoverCell = null) {
+            const torus = allTori.find(t => t.insidePlane === plane || t.outsidePlane === plane);
+            if (!torus) return;
+            const isInside = plane.name.includes('inside');
+            const label = isInside ? 'INSIDE (PRIVATE)' : 'OUTSIDE (PUBLIC)';
+            const cells = torus.selectedCells[isInside ? 'inside' : 'outside'];
+            const textState = textStates[currentTextStateIndex];
+            
+            plane.material.map.dispose();
+            plane.material.map = createGridTexture(label, cells, torus.color, hoverCell, textState);
+        }
+
+        class Torus {
+            constructor(color, index) {
+                this.color = color;
+                this.index = index;
+                this.state = 'flat';
+                this.hasBeenFormed = false;
+                this.selectedCells = { inside: new Set(), outside: new Set() };
+
+                const textState = textStates[currentTextStateIndex];
+                const insideGeometry = new THREE.PlaneGeometry(GRID_WIDTH, GRID_HEIGHT, COLS, ROWS);
+                this.insidePlane = new THREE.Mesh(insideGeometry, new THREE.MeshBasicMaterial({ map: createGridTexture('INSIDE (PRIVATE)', this.selectedCells.inside, this.color, null, textState), side: THREE.DoubleSide }));
+                
+                const outsideGeometry = new THREE.PlaneGeometry(GRID_WIDTH, GRID_HEIGHT, COLS, ROWS);
+                this.outsidePlane = new THREE.Mesh(outsideGeometry, new THREE.MeshBasicMaterial({ map: createGridTexture('OUTSIDE (PUBLIC)', this.selectedCells.outside, this.color, null, textState), side: THREE.DoubleSide }));
+
+                this.insidePlane.name = `inside_${index}`;
+                this.outsidePlane.name = `outside_${index}`;
+                
+                this.insidePlane.position.y = GRID_HEIGHT / 2 + 20;
+                this.outsidePlane.position.y = -(GRID_HEIGHT / 2 + 20);
+
+                this.initialPositions = {
+                    inside: this.insidePlane.geometry.attributes.position.array.slice(),
+                    outside: this.outsidePlane.geometry.attributes.position.array.slice()
+                };
+                this.torusPositions = { inside: null, outside: null };
+                
+                this.group = new THREE.Group();
+                this.group.add(this.insidePlane, this.outsidePlane);
+                this.group.visible = false;
+                scene.add(this.group);
+            }
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            clock = new THREE.Clock();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+            camera.position.copy(lastExteriorCamPos);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            canvasContainer.appendChild(renderer.domElement);
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.enablePan = false;
+            controls.enableRotate = false;
+            controls.enableZoom = true;
+
+            worldOriginGizmo = new THREE.AxesHelper(100);
+            scene.add(worldOriginGizmo);
+
+            initGizmo();
+
+            const geoGeosphere = new THREE.IcosahedronGeometry(GRID_WIDTH * 2, 3);
+            const matGeosphere = new THREE.MeshBasicMaterial({ color: 0x4B5563, wireframe: true, transparent: true, opacity: 0.1 });
+            geosphereTop = new THREE.Mesh(geoGeosphere, matGeosphere);
+            geosphereBottom = new THREE.Mesh(geoGeosphere, matGeosphere.clone());
+            geosphereTop.position.y = GRID_WIDTH * 2.5;
+            geosphereBottom.position.y = -GRID_WIDTH * 2.5;
+            scene.add(geosphereTop, geosphereBottom);
+
+            const loader = new THREE.TextureLoader();
+            const avatarTexture = loader.load('https://placehold.co/600x400/111827/FFFFFF?text=Avatar+Builder');
+            const avatarMaterial = new THREE.MeshBasicMaterial({ map: avatarTexture, transparent: true });
+            const avatarGeometry = new THREE.PlaneGeometry(600, 400);
+            avatarPlane = new THREE.Mesh(avatarGeometry, avatarMaterial);
+            avatarPlane.visible = false;
+            scene.add(avatarPlane);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            setupUI();
+            switchTorus(0);
+
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('keydown', onKey);
+            window.addEventListener('keyup', onKey);
+            canvasContainer.addEventListener('pointerdown', onPointerDown);
+            canvasContainer.addEventListener('pointermove', onPointerMove);
+            canvasContainer.addEventListener('pointerup', onPointerUp);
+        }
+        
+        function initGizmo() {
+            gizmoRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            gizmoRenderer.setSize(100, 100);
+            gizmoContainer.appendChild(gizmoRenderer.domElement);
+            
+            gizmoScene = new THREE.Scene();
+            gizmoCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+            
+            const gizmoHelper = new THREE.AxesHelper(3);
+            gizmoScene.add(gizmoHelper);
+        }
+
+        function setupUI() {
+            const topYinYang = document.createElement('div');
+            topYinYang.className = 'sidebar-icon';
+            topYinYang.innerHTML = '☯';
+            topYinYang.addEventListener('click', () => {
+                geosphereTop.visible = !geosphereTop.visible;
+                incrementStep('Toggled Top Geosphere');
+            });
+            rightSidebar.appendChild(topYinYang);
+
+            [...chakraData].reverse().forEach((chakra, i) => {
+                const originalIndex = chakraData.length - 1 - i;
+                const dot = document.createElement('div');
+                dot.className = 'sidebar-icon chakra-dot';
+                dot.style.backgroundColor = chakra.color;
+                dot.style.setProperty('--glow-color', chakra.color);
+                dot.dataset.index = originalIndex;
+                dot.addEventListener('click', () => switchTorus(originalIndex));
+                rightSidebar.appendChild(dot);
+            });
+            
+            const bottomYinYang = document.createElement('div');
+            bottomYinYang.className = 'sidebar-icon';
+            bottomYinYang.innerHTML = '☯';
+            bottomYinYang.style.transform = 'rotate(90deg)';
+            bottomYinYang.addEventListener('click', () => {
+                geosphereBottom.visible = !geosphereBottom.visible;
+                incrementStep('Toggled Bottom Geosphere');
+            });
+            rightSidebar.appendChild(bottomYinYang);
+
+            viewSelect.addEventListener('change', (e) => {
+                const torus = allTori[activeTorusIndex];
+                incrementStep(`View Changed to ${e.target.value}`);
+                if (e.target.value === 'torus') {
+                    if (!torus.hasBeenFormed) {
+                        startAnimation(torus);
+                    } else {
+                        setView(torus, 'torus');
+                    }
+                } else {
+                    setView(torus, 'flat');
+                }
+            });
+
+            interiorBtn.addEventListener('click', () => toggleInteriorView(allTori[activeTorusIndex]));
+            textToggleSelect.addEventListener('change', (e) => {
+                currentTextStateIndex = textStates.indexOf(e.target.value);
+                incrementStep(`Text State to ${e.target.value}`);
+                toggleTextState();
+            });
+            saveBtn.addEventListener('click', saveState);
+            loadBtn.addEventListener('click', loadState);
+            resetBtn.addEventListener('click', resetState);
+            worldOriginToggle.addEventListener('change', (e) => {
+                worldOriginGizmo.visible = e.target.checked;
+                incrementStep(`World Origin Gizmo ${e.target.checked ? 'On' : 'Off'}`);
+            });
+            
+            leftToolbarBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const pageId = btn.dataset.page;
+                    switchPage(pageId);
+                });
+            });
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            leftToolbarBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`.left-toolbar-btn[data-page="${pageId}"]`).classList.add('active');
+            
+            allTori.forEach(t => t.group.visible = false);
+            avatarPlane.visible = false;
+
+            if (pageId === 'aura-builder-page') {
+                allTori[activeTorusIndex].group.visible = true;
+            } else if (pageId === 'avatar-builder-page') {
+                avatarPlane.visible = true;
+            }
+            
+            const pageName = pageId.replace('-page', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            if (!localStorage.getItem(`visited_${pageId}`)) {
+                const welcomeDiv = document.createElement('div');
+                welcomeDiv.className = 'welcome-message';
+                welcomeDiv.innerHTML = `<h2 class="text-2xl font-bold mb-4">You Have Now Entered ${pageName}</h2><p>Let's Begin</p>`;
+                document.body.appendChild(welcomeDiv);
+                
+                setTimeout(() => {
+                    welcomeDiv.style.transition = 'opacity 0.5s';
+                    welcomeDiv.style.opacity = '0';
+                    setTimeout(() => welcomeDiv.remove(), 500);
+                }, 2000);
+                
+                localStorage.setItem(`visited_${pageId}`, 'true');
+            }
+        }
+        
+        function toggleTextState() {
+            allTori.forEach(torus => {
+                if (torus) {
+                    updateTexture(torus.insidePlane);
+                    updateTexture(torus.outsidePlane);
+                }
+            });
+        }
+
+        function switchTorus(index) {
+            if (!allTori[index]) {
+                allTori[index] = new Torus(chakraData[index].color, index);
+            }
+
+            allTori.forEach(t => t.group.visible = false);
+            allTori[index].group.visible = true;
+            activeTorusIndex = index;
+            
+            const chakra = chakraData[index];
+            activeChakraHeader.textContent = `${chakra.name} Chakra`;
+            activeChakraHeader.style.color = chakra.color;
+            incrementStep(`Switched to ${chakra.name} Chakra`);
+
+            document.querySelectorAll('.chakra-dot').forEach(dot => {
+                dot.classList.toggle('active', parseInt(dot.dataset.index) === index);
+            });
+
+            updateUIForTorus(allTori[index]);
+        }
+
+        function updateUIForTorus(torus) {
+            viewSelect.value = torus.state;
+            interiorBtn.style.display = torus.hasBeenFormed ? 'block' : 'none';
+        }
+        
+        function getIntersectedCell(event) {
+            const activeTorus = allTori[activeTorusIndex];
+            if (!activeTorus || !activeTorus.group.visible) return null;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            
+            const objectsToIntersect = [activeTorus.insidePlane, activeTorus.outsidePlane];
+            const intersects = raycaster.intersectObjects(objectsToIntersect);
+
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
+                const uv = intersect.uv;
+                const cellX = Math.floor(uv.x * COLS);
+                const cellY = ROWS - 1 - Math.floor(uv.y * ROWS);
+                return { plane: intersect.object, x: cellX, y: cellY };
+            }
+            return null;
+        }
+
+        function onPointerDown(event) {
+            if (controls.enablePan || controls.enableRotate) return;
+            isDragging = true;
+            const intersected = getIntersectedCell(event);
+            if (intersected) {
+                toggleCellSelection(intersected.plane, intersected.x, intersected.y);
+            }
+        }
+        
+        function onPointerMove(event) {
+            const intersected = getIntersectedCell(event);
+            const activeTorus = allTori[activeTorusIndex];
+
+            if (activeTorus && activeTorus.group.visible) {
+                updateTexture(activeTorus.insidePlane, activeTorus.insidePlane === intersected?.plane ? intersected : null);
+                updateTexture(activeTorus.outsidePlane, activeTorus.outsidePlane === intersected?.plane ? intersected : null);
+            }
+
+            if (isDragging && !(controls.enablePan || controls.enableRotate) && intersected) {
+                toggleCellSelection(intersected.plane, intersected.x, intersected.y, true);
+            }
+        }
+
+        function onPointerUp() {
+            if (isDragging) {
+                incrementStep('Facet Drag Selection');
+            }
+            isDragging = false;
+        }
+        
+        function onKey(event) {
+            if (event.code === 'Space') {
+                event.preventDefault();
+                const isDown = event.type === 'keydown';
+                controls.enablePan = isDown;
+                controls.enableRotate = isDown;
+                canvasContainer.style.cursor = isDown ? 'grab' : 'crosshair';
+            }
+        }
+
+        function toggleCellSelection(plane, x, y, addOnly = false) {
+            const torus = allTori.find(t => t.insidePlane === plane || t.outsidePlane === plane);
+            if (!torus) return;
+            const isInside = plane.name.includes('inside');
+            const cellSet = isInside ? torus.selectedCells.inside : torus.selectedCells.outside;
+            const key = `${x}-${y}`;
+            
+            let changed = false;
+            if (cellSet.has(key) && !addOnly) {
+                cellSet.delete(key);
+                changed = true;
+            } else if (!cellSet.has(key)) {
+                cellSet.add(key);
+                changed = true;
+            }
+
+            if (changed && !isDragging) {
+                incrementStep('Toggled Cell');
+            }
+            
+            updateTexture(plane);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function startAnimation(torus) {
+            if (torus.state !== 'flat') return;
+            torus.state = 'animating';
+            incrementStep('Start Formation Animation');
+            
+            const duration = 1.5;
+            const targetYInside = 0.5;
+            const targetYOutside = -0.5;
+            const insideStartPos = torus.insidePlane.position.clone();
+            const outsideStartPos = torus.outsidePlane.position.clone();
+            
+            let elapsedTime = 0;
+            const sandwichLoop = () => {
+                elapsedTime += clock.getDelta();
+                const progress = Math.min(elapsedTime / duration, 1);
+                torus.insidePlane.position.lerpVectors(insideStartPos, new THREE.Vector3(0, targetYInside, 0), progress);
+                torus.outsidePlane.position.lerpVectors(outsideStartPos, new THREE.Vector3(0, targetYOutside, 0), progress);
+                if (progress < 1) requestAnimationFrame(sandwichLoop);
+                else rollAnimation(torus);
+            };
+            sandwichLoop();
+        }
+
+        function rollAnimation(torus) {
+            const duration = 2.0;
+            const radius = GRID_HEIGHT / (2 * Math.PI);
+            const posAttrIn = torus.insidePlane.geometry.attributes.position;
+            const initPosIn = torus.initialPositions.inside;
+            const posAttrOut = torus.outsidePlane.geometry.attributes.position;
+            const initPosOut = torus.initialPositions.outside;
+            let elapsedTime = 0;
+            const rollLoop = () => {
+                elapsedTime += clock.getDelta();
+                const progress = Math.min(elapsedTime / duration, 1);
+                const morph = (posAttr, initPos, rOffset) => {
+                    for (let i = 0; i < posAttr.count; i++) {
+                        const y = initPos[i * 3 + 1];
+                        const angle = (y / GRID_HEIGHT) * 2 * Math.PI;
+                        const targetY = Math.cos(angle) * (radius + rOffset);
+                        const targetZ = Math.sin(angle) * (radius + rOffset);
+                        posAttr.setY(i, y + (targetY - y) * progress);
+                        posAttr.setZ(i, 0 + (targetZ - 0) * progress);
+                    }
+                    posAttr.needsUpdate = true;
+                };
+                morph(posAttrIn, initPosIn, -0.5);
+                morph(posAttrOut, initPosOut, 0.5);
+                if (progress < 1) requestAnimationFrame(rollLoop);
+                else bendAnimation(torus);
+            };
+            rollLoop();
+        }
+
+        function bendAnimation(torus) {
+            const duration = 2.5;
+            const tubeRadius = GRID_HEIGHT / (2 * Math.PI);
+            const torusRadius = tubeRadius;
+            const posAttrIn = torus.insidePlane.geometry.attributes.position;
+            const cylPosIn = posAttrIn.array.slice();
+            const posAttrOut = torus.outsidePlane.geometry.attributes.position;
+            const cylPosOut = posAttrOut.array.slice();
+            let elapsedTime = 0;
+            const bendLoop = () => {
+                elapsedTime += clock.getDelta();
+                const progress = Math.min(elapsedTime / duration, 1);
+                const morph = (posAttr, initialPos, rOffset) => {
+                    for (let i = 0; i < posAttr.count; i++) {
+                        const cylX = initialPos[i * 3];
+                        const cylY = initialPos[i * 3 + 1];
+                        const cylZ = initialPos[i * 3 + 2];
+                        const R = torusRadius;
+                        const r = tubeRadius + rOffset;
+                        const mainAngle = (cylX / GRID_WIDTH) * 2 * Math.PI;
+                        const tubeAngle = Math.atan2(cylZ, cylY);
+                        const targetX = (R + r * Math.cos(tubeAngle)) * Math.cos(mainAngle);
+                        const targetY = r * Math.sin(tubeAngle);
+                        const targetZ = (R + r * Math.cos(tubeAngle)) * Math.sin(mainAngle);
+                        posAttr.setX(i, cylX + (targetX - cylX) * progress);
+                        posAttr.setY(i, cylY + (targetY - cylY) * progress);
+                        posAttr.setZ(i, cylZ + (targetZ - cylZ) * progress);
+                    }
+                    posAttr.needsUpdate = true;
+                };
+                morph(posAttrIn, cylPosIn, -0.5);
+                morph(posAttrOut, cylPosOut, 0.5);
+                if (progress < 1) requestAnimationFrame(bendLoop);
+                else {
+                    torus.state = 'torus';
+                    torus.hasBeenFormed = true;
+                    torus.torusPositions.inside = torus.insidePlane.geometry.attributes.position.array.slice();
+                    torus.torusPositions.outside = torus.outsidePlane.geometry.attributes.position.array.slice();
+                    updateUIForTorus(torus);
+                }
+            };
+            bendLoop();
+        }
+
+        function setView(torus, view) {
+             if (torus.state === 'animating' || cameraState.includes('moving')) return;
+             if (view === 'torus') {
+                torus.insidePlane.geometry.attributes.position.copyArray(torus.torusPositions.inside);
+                torus.outsidePlane.geometry.attributes.position.copyArray(torus.torusPositions.outside);
+                torus.insidePlane.position.set(0, 0, 0);
+                torus.outsidePlane.position.set(0, 0, 0);
+                torus.insidePlane.geometry.attributes.position.needsUpdate = true;
+                torus.outsidePlane.geometry.attributes.position.needsUpdate = true;
+                torus.state = 'torus';
+             } else { // flat view
+                torus.insidePlane.geometry.attributes.position.copyArray(torus.initialPositions.inside);
+                torus.outsidePlane.geometry.attributes.position.copyArray(torus.initialPositions.outside);
+                torus.insidePlane.position.set(0, GRID_HEIGHT / 2 + 20, 0);
+                torus.outsidePlane.position.set(0, -(GRID_HEIGHT / 2 + 20), 0);
+                torus.insidePlane.geometry.attributes.position.needsUpdate = true;
+                torus.outsidePlane.geometry.attributes.position.needsUpdate = true;
+                torus.state = 'flat';
+             }
+             updateUIForTorus(torus);
+        }
+
+        function toggleInteriorView(torus) {
+            if (torus.state !== 'torus' || cameraState.includes('moving')) return;
+
+            const duration = 1.5;
+            let elapsedTime = 0;
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+
+            if (cameraState === 'outside') {
+                cameraState = 'moving-in';
+                incrementStep('Enter Interior View');
+                lastExteriorCamPos.copy(camera.position);
+                const tubeRadius = GRID_HEIGHT / (2 * Math.PI);
+                const torusRadius = tubeRadius;
+                const endPos = new THREE.Vector3(torusRadius + tubeRadius / 2, 0, 0);
+                const endTarget = new THREE.Vector3(0,0,0);
+                
+                const moveLoop = () => {
+                    elapsedTime += clock.getDelta();
+                    const progress = Math.min(elapsedTime / duration, 1);
+                    camera.position.lerpVectors(startPos, endPos, progress);
+                    controls.target.lerpVectors(startTarget, endTarget, progress);
+                    if (progress < 1) requestAnimationFrame(moveLoop);
+                    else {
+                        cameraState = 'inside';
+                        torus.outsidePlane.visible = false;
+                        interiorBtn.textContent = 'Exit Interior';
+                    }
+                };
+                moveLoop();
+            } else { // cameraState is 'inside'
+                cameraState = 'moving-out';
+                incrementStep('Exit Interior View');
+                const endPos = lastExteriorCamPos;
+                const endTarget = new THREE.Vector3(0,0,0);
+                
+                const moveLoop = () => {
+                    elapsedTime += clock.getDelta();
+                    const progress = Math.min(elapsedTime / duration, 1);
+                    camera.position.lerpVectors(startPos, endPos, progress);
+                    controls.target.lerpVectors(startTarget, endTarget, progress);
+                     if (progress < 1) requestAnimationFrame(moveLoop);
+                    else {
+                        cameraState = 'outside';
+                        torus.outsidePlane.visible = true;
+                        interiorBtn.textContent = 'Enter Interior';
+                    }
+                };
+                moveLoop();
+            }
+        }
+        
+        function saveState() {
+            incrementStep('State Saved');
+            const stateToSave = allTori.map(torus => {
+                if (!torus) return null;
+                return {
+                    selectedInside: Array.from(torus.selectedCells.inside),
+                    selectedOutside: Array.from(torus.selectedCells.outside)
+                };
+            });
+            localStorage.setItem('auraIntelligenceState', JSON.stringify(stateToSave));
+            alert('State saved!');
+        }
+        
+        function loadState() {
+            incrementStep('State Loaded');
+            const savedState = localStorage.getItem('auraIntelligenceState');
+            if (savedState) {
+                const loadedData = JSON.parse(savedState);
+                loadedData.forEach((data, index) => {
+                    if (data) {
+                        if (!allTori[index]) {
+                             allTori[index] = new Torus(chakraData[index].color, index);
+                        }
+                        const torus = allTori[index];
+                        torus.selectedCells.inside = new Set(data.selectedInside);
+                        torus.selectedCells.outside = new Set(data.selectedOutside);
+                        updateTexture(torus.insidePlane);
+                        updateTexture(torus.outsidePlane);
+                    }
+                });
+                 alert('State loaded!');
+            } else {
+                alert('No saved state found.');
+            }
+        }
+        
+        function resetState() {
+            incrementStep('State Reset');
+            const torus = allTori[activeTorusIndex];
+            if(torus) {
+                torus.selectedCells.inside.clear();
+                torus.selectedCells.outside.clear();
+                updateTexture(torus.insidePlane);
+                updateTexture(torus.outsidePlane);
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls.enabled) {
+                controls.update();
+            }
+            
+            gizmoCamera.quaternion.copy(camera.quaternion);
+            
+            renderer.autoClear = false;
+            renderer.clear();
+            renderer.render(scene, camera);
+            
+            gizmoRenderer.clearDepth();
+            gizmoRenderer.render(gizmoScene, gizmoCamera);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
