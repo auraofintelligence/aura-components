@@ -1,78 +1,65 @@
-# Aura Components Public Stewardship Licence
+# Strange But True Public Source Licence
 
-Copyright (c) Luke Hayes / Aura of Intelligence. All rights reserved except as allowed below.
+Copyright (c) 2026 Luke Nathan Hayes / Strange But True / Aura of Intelligence.
+All rights reserved except as allowed below.
 
-This is a plain-language stewardship licence for the Aura Components public repository. It is written for an exploratory Aura interface and component workbench, not as a generic software product licence.
+This is a plain-language licence for aura-components.
 
-## 1. What This Repo Is
+This is not an open-source licence. It is a public source licence: people can read, learn from and use the work personally, but commercial and corporate rights stay with Luke Nathan Hayes.
 
-This repository contains Aura Components, including the Aura Builder, avatar builder, timeline, memory palace, social media intelligence, algorithm marketplace, file storage, IoT interface concepts, page code, visual design, labels, workflows and related interface material.
+## 1. What You Can Do
 
-Nothing in this repo should be treated as finished security, privacy, encryption, scheduling, data-governance, crypto, legal, financial, medical or production infrastructure unless Luke Hayes explicitly says so.
+You may view, share, clone, study, reference and adapt this repo for personal, educational, artistic, research, community or other non-commercial use.
 
-## 2. Non-Commercial Public Use
+You may use a personal AI assistant to help read, explain or adapt the repo for those allowed non-commercial uses.
 
-You may view, share links to, clone, study, reference and adapt this repo for personal, community, educational, artistic, research, public-interest or other non-commercial purposes.
+If you use or adapt the work, give clear credit:
 
-This includes learning from the Aura interface patterns, adapting component structures for your own non-commercial work, and using the repo as inspiration for public-interest tools.
+Based on aura-components by Luke Nathan Hayes / Strange But True / Aura of Intelligence.
+Original project: https://github.com/auraofintelligence/aura-components
+Used under the Strange But True Public Source Licence.
 
-When practical, please credit Aura of Intelligence and Luke Hayes, and link back to the original project:
+## 2. What You Cannot Do Without Permission
 
-https://github.com/auraofintelligence/aura-components
+You may not use this repo, its code, ideas, text, designs, workflows, data structures, assets, names or close derivatives for commercial, corporate, institutional, government, startup, agency, client or employer purposes without written permission from Luke Nathan Hayes.
 
-## 3. Commercial Rights Reserved
+That means you may not:
 
-All commercial rights are reserved to Luke Hayes / Aura of Intelligence.
+- sell, monetise, repackage, licence, sponsor, advertise with or commercially distribute the work;
+- use it in paid products, SaaS tools, client work, consulting, courses, workshops, dashboards, templates or commercial infrastructure;
+- use it inside a company, agency, startup, institution, government body or funded commercial project;
+- use it for commercial AI training, datasets, embeddings, knowledge bases, agents, model products or evaluation systems;
+- remove attribution or present the work as your own;
+- use Strange But True, Aura of Intelligence, Luke Nathan Hayes, project names, screenshots, music, writing, images or brand material to imply endorsement, partnership or approval.
 
-You may not sell, monetise, repackage, licence, sponsor, advertise with, merchandise, commercially publish, commercially distribute, commercially train systems on, or commercially exploit Aura Components without written permission.
+## 3. Commercial Rights
 
-This includes, but is not limited to:
+All commercial rights are reserved to Luke Nathan Hayes.
 
-- the Aura Components name, interface patterns, field models and builder workflows
-- the Aura of Intelligence name, brand, visual language and related narrative materials
-- paid dashboards, commercial templates, SaaS products, client services, courses, data products, programmable agents, crypto actions or commercial infrastructure derived from this repo
-- screenshots, generated assets, page copy, builder workflows, data models, docs, demos or close copies of the interface
+Commercial use requires written permission from Luke Nathan Hayes. Permission can be granted, denied, limited, priced or handled under a separate agreement.
 
-Commercial use requires written permission from Luke Hayes.
+## 4. Your Own Outputs
 
-## 4. User Data And Local Outputs
+If this repo lets you create your own notes, Markdown files, exports, maps, profiles, plans or other personal outputs, those outputs belong to you.
 
-Where the components allow local state, exports or user-created records, Aura Components claims no ownership over records you create for yourself.
+You are responsible for what you put into the tool, what you export, and where you share it.
 
-You are responsible for what you put into the tools, what you export, and where you share it.
+## 5. Third-Party Material
 
-Do not use this public prototype to store secrets, private keys, medical records, legal records, passwords, production credentials or other sensitive material.
+This licence only covers original material created by Luke Nathan Hayes / Strange But True / Aura of Intelligence.
 
-## 5. Code, Forms And Component Structures
+Third-party libraries, fonts, APIs, platforms, services or embedded material keep their own licences.
 
-The code, interface forms and component structures are shared so people can learn from the approach and adapt it for non-commercial creative, educational, research or public-interest work.
-
-If you improve the public infrastructure, fix bugs, or develop useful patterns from it, please share useful notes, fixes or improvements back to the commons where reasonable.
-
-Do not sell this repo, its templates, its builder systems, or close copies of its planning, interface or mapping infrastructure as a standalone product.
-
-## 6. Honest Provenance
-
-If you adapt non-commercial parts of this repo, keep the provenance clear.
-
-Do not remove attribution in a way that makes the work look like it originated elsewhere. Do not use the Aura of Intelligence name, logo, language, screenshots or planning material to imply endorsement, partnership, sponsorship or approval without written permission.
-
-## 7. Harmful Or Deceptive Use
+## 6. No Harmful Or Misleading Use
 
 You may not use this repo or its material for deceptive, exploitative, aggressive, hateful, harassing, unsafe or harmful purposes.
 
-You may not use the material to mislead people about privacy, security, encryption, law, finance, health, public events, public safety, programmable actions, crypto systems or current events.
+You may not use it to mislead people about privacy, security, law, finance, health, public safety, governance, crypto, AI capability or current events.
 
-## 8. Third-Party Material
-
-Any third-party libraries, browser APIs, fonts or externally hosted packages keep their own licences.
-
-This licence does not remove any rights that third-party authors already grant under their own licences.
-
-## 9. No Warranty
+## 7. No Warranty
 
 This repo is provided as-is.
 
-Luke Hayes and Aura of Intelligence make no warranties and accept no liability for how you choose to use, adapt, interpret, deploy or rely on this material.
+Luke Nathan Hayes / Strange But True / Aura of Intelligence make no warranties and accept no liability for how you use, adapt, interpret, deploy or rely on this material.
 
-Build wisely, keep provenance clear, and do not treat these prototypes as finished privacy-preserving systems.
+Public prototypes are not finished legal, medical, financial, privacy, security, public-safety, governance, crypto, AI-governance or production infrastructure unless Luke Nathan Hayes explicitly says so in writing.
